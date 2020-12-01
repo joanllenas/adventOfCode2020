@@ -1,0 +1,62 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 02fbd73e8cd17d7cab126856e75a7994e35c2edbc8272fcc3e14991b5b5f9ba7
+
+name:           adventOfCode2020
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/joanllenas/adventOfCode2020#readme>
+homepage:       https://github.com/joanllenas/adventOfCode2020#readme
+bug-reports:    https://github.com/joanllenas/adventOfCode2020/issues
+author:         Joan Llenas Masó
+maintainer:     example@example.com
+copyright:      2020 Joan Llenas Masó
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/joanllenas/adventOfCode2020
+
+library
+  exposed-modules:
+      Day1
+  other-modules:
+      Paths_adventOfCode2020
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable adventOfCode2020-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_adventOfCode2020
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      adventOfCode2020
+    , base >=4.7 && <5
+  default-language: Haskell2010
+
+test-suite adventOfCode2020-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_adventOfCode2020
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      adventOfCode2020
+    , base >=4.7 && <5
+  default-language: Haskell2010
