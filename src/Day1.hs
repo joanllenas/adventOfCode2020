@@ -11,7 +11,7 @@ xy2020 :: [(Int, Int)]
 xy2020 = [(x, y) | x <- input, y <- input, x + y == 2020]
 
 part1 = case xy2020 of
-  [] -> "Result not found"
+  [] -> "Part 1 Result not found"
   ((x, y) : _) -> printf "Part 1 result is: %d * %d = %d" x y (x * y)
 
 -- Part 2
@@ -20,12 +20,13 @@ xyz2020 :: [(Int, Int, Int)]
 xyz2020 = [(x, y, z) | x <- input, y <- input, z <- input, x + y + z == 2020]
 
 part2 = case xyz2020 of
-  [] -> "Result not found"
+  [] -> "Part 2 Result not found"
   ((x, y, z) : _) -> printf "Part 2 result is: %d * %d * %d = %d" x y z (x * y * z)
 
 -- Result
 
 day1 :: IO ()
 day1 = do
+  putStrLn "-- Day 1 --"
   putStrLn part1
   putStrLn part2

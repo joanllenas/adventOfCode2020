@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 02fbd73e8cd17d7cab126856e75a7994e35c2edbc8272fcc3e14991b5b5f9ba7
+-- hash: bfca05fc087fda2af343ab7ba337effc02b2e7cf7d43dc8860c688b0b4fa7f7a
 
 name:           adventOfCode2020
 version:        0.1.0.0
@@ -28,12 +28,17 @@ source-repository head
 library
   exposed-modules:
       Day1
+      Day2
   other-modules:
       Paths_adventOfCode2020
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
+    , directory
+    , hspec
+    , parsec
   default-language: Haskell2010
 
 executable adventOfCode2020-exe
@@ -44,8 +49,12 @@ executable adventOfCode2020-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      adventOfCode2020
+      QuickCheck
+    , adventOfCode2020
     , base >=4.7 && <5
+    , directory
+    , hspec
+    , parsec
   default-language: Haskell2010
 
 test-suite adventOfCode2020-test
@@ -57,6 +66,10 @@ test-suite adventOfCode2020-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      adventOfCode2020
+      QuickCheck
+    , adventOfCode2020
     , base >=4.7 && <5
+    , directory
+    , hspec
+    , parsec
   default-language: Haskell2010

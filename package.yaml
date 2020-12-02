@@ -21,6 +21,10 @@ description: Please see the README on GitHub at <https://github.com/joanllenas/a
 
 dependencies:
   - base >= 4.7 && < 5
+  - directory
+  - parsec
+  - QuickCheck
+  - hspec
 
 library:
   source-dirs: src
