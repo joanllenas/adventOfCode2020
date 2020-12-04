@@ -1,7 +1,7 @@
 module Day3 (day3, TerrainItem (..), JourneyLog (..), addSlope, getItemAtCoord) where
 
 import Data.Bool
-import Utils (getInputData)
+import qualified Utils
 
 -- Model
 
@@ -78,11 +78,4 @@ part2 input =
 -- Main
 
 day3 :: IO ()
-day3 = do
-  putStrLn "-- Day 3 --"
-  inputData <- getInputData "day-3.txt"
-  case inputData of
-    Left err -> putStrLn $ "Day 3: Error reading input file: " ++ show err
-    Right input -> do
-      putStrLn $ part1 input
-      putStrLn $ part2 input
+day3 = Utils.handleResultWith 3 part1 part2

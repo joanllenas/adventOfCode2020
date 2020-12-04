@@ -5,7 +5,7 @@ import Data.Either (rights)
 import qualified Data.List as List
 import qualified Text.Parsec as P
 import Text.Parsec.String (Parser)
-import Utils (getInputData)
+import qualified Utils
 
 ----------------
 -- Data Model
@@ -110,11 +110,4 @@ part2 inputData =
 ----------------
 
 day2 :: IO ()
-day2 = do
-  putStrLn "-- Day 2 --"
-  inputData <- getInputData "day-2.txt"
-  case inputData of
-    Left err -> putStrLn $ "Day 2: Error reading input file: " ++ show err
-    Right input -> do
-      putStrLn $ part1 input
-      putStrLn $ part2 input
+day2 = Utils.handleResultWith 2 part1 part2
