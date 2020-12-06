@@ -1,7 +1,16 @@
-module Utils (handleResultWith) where
+module Utils (handleResultWith, parse, hasSuffix) where
 
 import qualified Control.Exception as Exception
 import qualified System.Directory as Dir
+import qualified Text.Parsec as P
+import qualified Text.Parsec.String as Ps
+
+------------------------------------------
+-- Parsing
+------------------------------------------
+
+parse :: Ps.Parser a -> String -> Either P.ParseError a
+parse p = P.parse p ""
 
 ------------------------------------------
 -- Get Input Data
@@ -38,3 +47,12 @@ handleResultWith day pt1 pt2 = do
     Right input -> do
       putStrLn $ pt1 input
       putStrLn $ pt2 input
+
+------------------------------------------
+-- Misc Utils
+------------------------------------------
+
+hasSuffix :: String -> String -> Bool
+hasSuffix suffix s =
+  let pos = (length s) - (length suffix)
+   in drop pos s == suffix

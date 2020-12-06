@@ -5,7 +5,7 @@ import Data.Either (rights)
 import qualified Data.List as List
 import qualified Text.Parsec as P
 import Text.Parsec.String (Parser)
-import qualified Utils
+import qualified Utils as U
 
 ----------------
 -- Data Model
@@ -44,7 +44,7 @@ passwordDefP = do
   MkPasswordDef n1 n2 l <$> lastWord
 
 parsePasswordDef :: String -> Either P.ParseError PasswordDef
-parsePasswordDef = P.parse passwordDefP ""
+parsePasswordDef = U.parse passwordDefP
 
 parsePasswordDefs :: [String] -> [Either P.ParseError PasswordDef]
 parsePasswordDefs = map parsePasswordDef
@@ -110,4 +110,4 @@ part2 inputData =
 ----------------
 
 day2 :: IO ()
-day2 = Utils.handleResultWith 2 part1 part2
+day2 = U.handleResultWith 2 part1 part2

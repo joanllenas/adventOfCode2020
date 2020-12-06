@@ -25,6 +25,9 @@ dependencies:
   - parsec
   - QuickCheck
   - hspec
+  - split
+  - validation-selective
+  - either
 
 library:
   source-dirs: src
