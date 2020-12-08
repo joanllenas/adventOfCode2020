@@ -1,17 +1,39 @@
-module Day4 (day4, KeyValue (Kv), keyValueParser, passwordHasRequiredKeys, hexParser) where
+module Day4
+  ( day4,
+    KeyValue (Kv),
+    keyValueParser,
+    validatePasswordRequiredKeys,
+    hexParser,
+    rightKeyValues,
+    validateKey,
+    validatePassword,
+    validatePasswordKeys,
+    Password,
+  )
+where
 
+import Control.Applicative (Alternative ((<|>)))
 import Data.Either (rights)
 import Data.Either.Combinators (mapLeft)
 import Data.List.Split (splitWhen)
+import qualified Data.Map as Map
+import Data.Monoid
 import Debug.Trace (trace)
 import qualified Text.Parsec as P
 import Text.Parsec.String (Parser)
 import Text.Read
--- (Validation (..))
 import qualified Utils as U
 import qualified Validation as Val
 
 data KeyValue = Kv String String deriving (Show, Eq)
+
+instance Semigroup KeyValue where
+  Kv k v <> Kv _ v' = Kv k (v <> v')
+
+instance Monoid KeyValue where
+  mempty = Kv "" ""
+
+type Password = [KeyValue]
 
 keyValueParser :: Parser KeyValue
 keyValueParser = do
@@ -20,16 +42,19 @@ keyValueParser = do
   val <- P.many1 P.anyChar <* P.eof
   return $ Kv key val
 
-rightKeyValues :: [String] -> [KeyValue]
+rightKeyValues :: [String] -> Password
 rightKeyValues passGrp = rights $ map (U.parse keyValueParser) passGrp
 
-passwordHasRequiredKeys :: [KeyValue] -> Bool
-passwordHasRequiredKeys kvs =
+validatePasswordRequiredKeys :: Password -> Either String Password
+validatePasswordRequiredKeys kvs =
   let keys :: String
       keys = foldr (\(Kv k _) acc -> acc ++ k) "" kvs
       hasCid = elem "cid" $ map (\(Kv k _) -> k) kvs
-   in -- 3*8 is the length of all concatenated key Strings
-      hasCid && length keys == (3 * 8) || not hasCid && length keys == (3 * 7)
+      -- 3*8 is the length of all concatenated key Strings
+      hasReqKeys = hasCid && length keys == (3 * 8) || not hasCid && length keys == (3 * 7)
+   in if hasReqKeys
+        then Right kvs
+        else Left "Password doesn't have all required keys."
 
 ---------------------------------
 -- Part 1
@@ -37,10 +62,10 @@ passwordHasRequiredKeys kvs =
 
 part1 :: String -> String
 part1 s =
-  show $
+  (++) "Part 1 result is:" . show $
     length $
-      filter (== True) $
-        map (passwordHasRequiredKeys . rightKeyValues . concat) $
+      rights $
+        map (validatePasswordRequiredKeys . rightKeyValues . concat) $
           splitWhen (== []) $ -- [ [[String]] ]
             map words $ -- [ [String] ]
               lines s -- [String]
@@ -55,28 +80,84 @@ abcdefParser = P.choice [P.char 'a', P.char 'b', P.char 'c', P.char 'd', P.char 
 hexParser :: Parser String
 hexParser = do
   a <- P.char '#'
-  b <- P.many1 (P.choice [P.digit, abcdefParser]) <* P.eof
+  b <- P.count 6 (P.choice [P.digit, abcdefParser]) <* P.eof
   return $ a : b
 
-validateNumBounds :: Int -> Int -> String -> Either String String
-validateNumBounds up down s = case readMaybe s :: Maybe Int of
-  Just yr ->
-    if yr >= 1920 && yr <= 2002
-      then Right s
-      else Left $ "Number " ++ s ++ " out of bounds"
-  Nothing -> Left $ "Invalid year " ++ s
+heightParser :: Parser (String, String)
+heightParser = do
+  n <- P.many1 P.digit
+  l <- P.choice [P.string "in", P.string "cm"] <* P.eof
+  return (n, l)
 
-validateSuffix :: String -> String -> Either String String
-validateSuffix suffix s =
-  if U.hasSuffix suffix s
-    then Right s
-    else Left "Suffix not found"
+validateNumBounds :: Int -> Int -> KeyValue -> Val.Validation String KeyValue
+validateNumBounds min max kv@(Kv _ n) = case readMaybe n :: Maybe Int of
+  Just num ->
+    if num >= min && num <= max
+      then Val.Success kv
+      else Val.Failure $ "Number " ++ n ++ " out of bounds."
+  Nothing -> Val.Failure $ "Invalid number " ++ n ++ "."
 
-validateHex :: String -> Either String String
-validateHex = mapLeft show . U.parse hexParser
+validateHex :: KeyValue -> Val.Validation String KeyValue
+validateHex kv@(Kv _ s) = case U.parse hexParser s of
+  Right _ -> Val.Success kv
+  Left _ -> Val.Failure $ "Could not parse hex: " ++ s ++ "."
+
+validateColor :: KeyValue -> Val.Validation String KeyValue
+validateColor kv@(Kv _ s) =
+  if s `elem` ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
+    then Val.Success kv
+    else Val.Failure $ "Invalid color: " ++ s ++ "."
+
+validatePid :: KeyValue -> Val.Validation String KeyValue
+validatePid kv@(Kv _ s) = case U.parse pidParser s of
+  Right _ -> Val.Success kv
+  Left _ -> Val.Failure $ "Invalid pid: " ++ s ++ "."
+  where
+    pidParser :: Parser String
+    pidParser = P.count 9 P.digit <* P.eof
+
+validateHeight :: KeyValue -> Val.Validation String KeyValue
+validateHeight kv@(Kv _ s) = case U.parse heightParser s of
+  Right (n, "cm") -> kv <$ validateNumBounds 150 193 (Kv "" n)
+  Right (n, "in") -> kv <$ validateNumBounds 59 76 (Kv "" n)
+  Left _ -> Val.Failure $ "Could not parse height: " ++ s ++ "."
+
+validations :: Map.Map String (KeyValue -> Val.Validation String KeyValue)
+validations =
+  Map.fromList
+    [ ("byr", validateNumBounds 1920 2002),
+      ("iyr", validateNumBounds 2010 2020),
+      ("eyr", validateNumBounds 2020 2030),
+      ("hgt", validateHeight),
+      ("hcl", validateHex),
+      ("ecl", validateColor),
+      ("pid", validatePid),
+      ("cid", \(Kv k v) -> Val.Success (Kv k v))
+    ]
+
+validateKey :: KeyValue -> Val.Validation String KeyValue
+validateKey (Kv k v) = case Map.lookup k validations of
+  Just fn -> fn (Kv k v)
+  Nothing -> Val.Failure $ "Key " ++ k ++ "not found."
+
+validatePassword :: Password -> Val.Validation String Password
+validatePassword p = case foldMap validateKey p of
+  Val.Success _ -> Val.Success p
+  Val.Failure e -> Val.Failure $ "Invalid password: " ++ e
+
+validatePasswordKeys :: Either String Password -> Either String Password
+validatePasswordKeys password =
+  password >>= Val.validationToEither . validatePassword
 
 part2 :: String -> String
-part2 s = "TODO"
+part2 s =
+  (++) "Part 2 result is:" . show $
+    length $
+      rights $
+        map (validatePasswordKeys . validatePasswordRequiredKeys . rightKeyValues . concat) $
+          splitWhen (== []) $ -- [ [[String]] ]
+            map words $ -- [ [String] ]
+              lines s -- [String]
 
 -- Main
 

@@ -28,6 +28,7 @@ dependencies:
   - split
   - validation-selective
   - either
+  - containers
 
 library:
   source-dirs: src
