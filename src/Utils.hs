@@ -1,16 +1,25 @@
-module Utils (handleResultWith, parse, hasSuffix) where
+module Utils (handleResultWith, parseString, hasSuffix, int) where
 
+import Control.Applicative hiding ((<|>))
 import qualified Control.Exception as Exception
 import qualified System.Directory as Dir
-import qualified Text.Parsec as P
+import Text.Parsec
 import qualified Text.Parsec.String as Ps
 
 ------------------------------------------
 -- Parsing
 ------------------------------------------
 
-parse :: Ps.Parser a -> String -> Either P.ParseError a
-parse p = P.parse p ""
+parseString :: Ps.Parser a -> String -> Either ParseError a
+parseString p = parse p ""
+
+int :: Ps.Parser Int
+int = rd <$> (plus <|> minus <|> number)
+  where
+    rd = read :: String -> Int
+    plus = char '+' *> number
+    minus = (:) <$> char '-' <*> number
+    number = many1 digit
 
 ------------------------------------------
 -- Get Input Data
@@ -54,5 +63,5 @@ handleResultWith day pt1 pt2 = do
 
 hasSuffix :: String -> String -> Bool
 hasSuffix suffix s =
-  let pos = (length s) - (length suffix)
+  let pos = length s - length suffix
    in drop pos s == suffix

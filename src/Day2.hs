@@ -44,7 +44,7 @@ passwordDefP = do
   MkPasswordDef n1 n2 l <$> lastWord
 
 parsePasswordDef :: String -> Either P.ParseError PasswordDef
-parsePasswordDef = U.parse passwordDefP
+parsePasswordDef = U.parseString passwordDefP
 
 parsePasswordDefs :: [String] -> [Either P.ParseError PasswordDef]
 parsePasswordDefs = map parsePasswordDef

@@ -1,7 +1,7 @@
 module Day3 (day3, TerrainItem (..), JourneyLog (..), addSlope, getItemAtCoord) where
 
 import Data.Bool
-import qualified Utils
+import qualified Utils as U
 
 -- Model
 
@@ -78,4 +78,4 @@ part2 input =
 -- Main
 
 day3 :: IO ()
-day3 = Utils.handleResultWith 3 part1 part2
+day3 = U.handleResultWith 3 part1 part2

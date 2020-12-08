@@ -43,7 +43,7 @@ keyValueParser = do
   return $ Kv key val
 
 rightKeyValues :: [String] -> Password
-rightKeyValues passGrp = rights $ map (U.parse keyValueParser) passGrp
+rightKeyValues passGrp = rights $ map (U.parseString keyValueParser) passGrp
 
 validatePasswordRequiredKeys :: Password -> Either String Password
 validatePasswordRequiredKeys kvs =
@@ -98,7 +98,7 @@ validateNumBounds min max kv@(Kv _ n) = case readMaybe n :: Maybe Int of
   Nothing -> Val.Failure $ "Invalid number " ++ n ++ "."
 
 validateHex :: KeyValue -> Val.Validation String KeyValue
-validateHex kv@(Kv _ s) = case U.parse hexParser s of
+validateHex kv@(Kv _ s) = case U.parseString hexParser s of
   Right _ -> Val.Success kv
   Left _ -> Val.Failure $ "Could not parse hex: " ++ s ++ "."
 
@@ -109,7 +109,7 @@ validateColor kv@(Kv _ s) =
     else Val.Failure $ "Invalid color: " ++ s ++ "."
 
 validatePid :: KeyValue -> Val.Validation String KeyValue
-validatePid kv@(Kv _ s) = case U.parse pidParser s of
+validatePid kv@(Kv _ s) = case U.parseString pidParser s of
   Right _ -> Val.Success kv
   Left _ -> Val.Failure $ "Invalid pid: " ++ s ++ "."
   where
@@ -117,7 +117,7 @@ validatePid kv@(Kv _ s) = case U.parse pidParser s of
     pidParser = P.count 9 P.digit <* P.eof
 
 validateHeight :: KeyValue -> Val.Validation String KeyValue
-validateHeight kv@(Kv _ s) = case U.parse heightParser s of
+validateHeight kv@(Kv _ s) = case U.parseString heightParser s of
   Right (n, "cm") -> kv <$ validateNumBounds 150 193 (Kv "" n)
   Right (n, "in") -> kv <$ validateNumBounds 59 76 (Kv "" n)
   Left _ -> Val.Failure $ "Could not parse height: " ++ s ++ "."

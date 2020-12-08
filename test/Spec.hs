@@ -2,6 +2,7 @@ import Data.Either (isLeft, isRight)
 import Day2 (PasswordDef (MkPasswordDef), parsePasswordDef)
 import Day3 (JourneyLog (..), TerrainItem (..), addSlope, getItemAtCoord)
 import Day4 (KeyValue (Kv), Password, hexParser, keyValueParser, rightKeyValues, validateKey, validatePassword, validatePasswordKeys, validatePasswordRequiredKeys)
+import qualified Day8 as D8
 import Test.Hspec
 import Test.QuickCheck
 import qualified Utils as U
@@ -43,13 +44,13 @@ main = hspec $ do
 
   describe "Day4" $ do
     it "parsing 'hcl:fffffd' should be Right" $ do
-      U.parse keyValueParser "hcl:fffffd" `shouldBe` Right (Kv "hcl" "fffffd")
+      U.parseString keyValueParser "hcl:fffffd" `shouldBe` Right (Kv "hcl" "fffffd")
     it "parsing 'hcl:#fffffd' should be Right" $ do
-      U.parse keyValueParser "hcl:#fffffd" `shouldBe` Right (Kv "hcl" "#fffffd")
+      U.parseString keyValueParser "hcl:#fffffd" `shouldBe` Right (Kv "hcl" "#fffffd")
     it "parsing 'hcl:12345' should be Right" $ do
-      U.parse keyValueParser "hcl:12345" `shouldBe` Right (Kv "hcl" "12345")
+      U.parseString keyValueParser "hcl:12345" `shouldBe` Right (Kv "hcl" "12345")
     it "parsing 'hcl:1a2b' should be Right" $ do
-      U.parse keyValueParser "hcl:1a2b" `shouldBe` Right (Kv "hcl" "1a2b")
+      U.parseString keyValueParser "hcl:1a2b" `shouldBe` Right (Kv "hcl" "1a2b")
 
     it "validatePasswordRequiredKeys ['hcl:1a2b'] should be Left" $ do
       isLeft (validatePasswordRequiredKeys $ rightKeyValues ["hcl:1a2b"]) `shouldBe` True
@@ -62,9 +63,9 @@ main = hspec $ do
     it "validatePasswordRequiredKeys with all key value pairs except 'cid' and 'iyr' should be Left" $ do
       isLeft (validatePasswordRequiredKeys $ rightKeyValues ["byr:abcd", "eyr:abcd", "hgt:abcd", "hcl:abcd", "ecl:abcd", "pid:abcd"]) `shouldBe` True
     it "parsing '#012def' should be Right" $ do
-      U.parse hexParser "#012def" `shouldBe` Right "#012def"
+      U.parseString hexParser "#012def" `shouldBe` Right "#012def"
     it "parsing '#012' should be Left" $ do
-      isLeft (U.parse hexParser "#012") `shouldBe` True
+      isLeft (U.parseString hexParser "#012") `shouldBe` True
 
     it "validateKey Kv 'byr' '2002' should be Success" $ do
       validateKey (Kv "byr" "2002") `shouldBe` (Val.Success (Kv "byr" "2002") :: Day4Validation)
