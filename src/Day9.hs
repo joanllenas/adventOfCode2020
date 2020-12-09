@@ -1,6 +1,6 @@
 module Day9 (day9) where
 
-import Debug.Trace (trace)
+import Data.List
 import qualified Utils as U
 
 preamble :: Int
@@ -12,37 +12,63 @@ data Program = Prg
   }
   deriving (Show, Eq)
 
+createProgram :: [Int] -> Program
+createProgram list = Prg list preamble
+
 ----------------
 -- Part 1
 ----------------
 
-createProgram :: [Int] -> Program
-createProgram list = Prg list preamble
-
-crackXmas :: Program -> Program
-crackXmas (Prg list cursor) =
+crackXmas1 :: Program -> Program
+crackXmas1 (Prg list cursor) =
   let l = drop (cursor - preamble) $ take cursor list
       n = list !! cursor
-   in -- nn = trace (show l ++ " cursor:" ++ show cursor ++ " num:" ++ show n) n
-      case [(x, y) | x <- l, y <- l, x + y == n, x /= y] of
+   in case [(x, y) | x <- l, y <- l, x + y == n, x /= y] of
         [] -> Prg list cursor
-        _ -> crackXmas (Prg list (cursor + 1))
+        _ -> crackXmas1 (Prg list (cursor + 1))
 
-part1 :: String -> String
-part1 =
-  show
-    . (\(Prg list cursor) -> list !! cursor)
-    . crackXmas
+runProgram1 :: String -> Program
+runProgram1 =
+  crackXmas1
     . createProgram
     . map (\l -> read l :: Int)
     . lines
+
+part1 :: String -> String
+part1 =
+  (++) "Part 1 result is: "
+    . show
+    . (\(Prg list cursor) -> list !! cursor)
+    . runProgram1
 
 ----------------
 -- Part 2
 ----------------
 
+createWindows :: Int -> [Int] -> [[Int]]
+createWindows size xs = transpose (take size (tails xs))
+
+windowSliding :: [Int] -> Int -> Int -> Maybe [Int]
+windowSliding list target size
+  | size < length list `div` 2 =
+    let ws = createWindows size list
+     in case find (\xs -> sum xs == target) ws of
+          Nothing -> windowSliding list target (size + 1)
+          Just win -> Just win
+  | otherwise = Nothing
+
+crackXmas2 :: ([Int], Int) -> Int
+crackXmas2 (list, target) = case windowSliding list target 2 of
+  Just xs -> let xs' = sort xs in head xs' + last xs'
+  Nothing -> 0
+
 part2 :: String -> String
-part2 input = "Part 2 result is: TODO"
+part2 =
+  (++) "Part 2 result is: "
+    . show
+    . crackXmas2
+    . (\(Prg list cursor) -> (list, list !! cursor))
+    . runProgram1
 
 ----------------
 -- Main
