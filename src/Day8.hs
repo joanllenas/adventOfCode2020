@@ -72,14 +72,7 @@ runProgram2 :: Program -> Int
 runProgram2 (Prg is pos acc) = -1
 
 part2 :: String -> String
-part2 =
-  (++) "Part 2 result is: "
-    . show
-    . runProgram2
-    . createProgram
-    . rights
-    . map (U.parseString instructionParser)
-    . lines
+part2 input = "Part 2 result is: TODO"
 
 ----------------
 -- Main
