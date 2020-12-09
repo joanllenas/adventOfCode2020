@@ -44,12 +44,12 @@ instructionParser = do
 createProgram :: [Instruction] -> Program
 createProgram inst = Prg inst 0 0
 
-runProgram :: Program -> Int
-runProgram (Prg is pos acc) = case is Lens.^? Lens.element pos of
-  Nothing -> -1
-  Just (Nop val (Vis v)) -> if v then acc else runProgram (Prg (setInstructionAt pos (Nop val (Vis True)) is) (pos + 1) acc)
-  Just (Acc val (Vis v)) -> if v then acc else runProgram (Prg (setInstructionAt pos (Acc val (Vis True)) is) (pos + 1) (acc + val))
-  Just (Jmp val (Vis v)) -> if v then acc else runProgram (Prg (setInstructionAt pos (Jmp val (Vis True)) is) (pos + val) acc)
+runProgram1 :: Program -> Int
+runProgram1 (Prg is pos acc) = case is Lens.^? Lens.element pos of
+  Nothing -> acc -- tried to reach `length is + 1`
+  Just (Nop val (Vis v)) -> if v then acc else runProgram1 (Prg (setInstructionAt pos (Nop val (Vis True)) is) (pos + 1) acc)
+  Just (Acc val (Vis v)) -> if v then acc else runProgram1 (Prg (setInstructionAt pos (Acc val (Vis True)) is) (pos + 1) (acc + val))
+  Just (Jmp val (Vis v)) -> if v then acc else runProgram1 (Prg (setInstructionAt pos (Jmp val (Vis True)) is) (pos + val) acc)
   where
     setInstructionAt :: Int -> Instruction -> [Instruction] -> [Instruction]
     setInstructionAt pos instr is = is Lens.& Lens.element pos Lens..~ instr
@@ -58,7 +58,7 @@ part1 :: String -> String
 part1 =
   (++) "Part 1 result is: "
     . show
-    . runProgram
+    . runProgram1
     . createProgram
     . rights
     . map (U.parseString instructionParser)
@@ -68,9 +68,18 @@ part1 =
 -- Part2
 ----------------
 
+runProgram2 :: Program -> Int
+runProgram2 (Prg is pos acc) = -1
+
 part2 :: String -> String
-part2 inputData =
-  "Part 2 result is: "
+part2 =
+  (++) "Part 2 result is: "
+    . show
+    . runProgram2
+    . createProgram
+    . rights
+    . map (U.parseString instructionParser)
+    . lines
 
 ----------------
 -- Main
