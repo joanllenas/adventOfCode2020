@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7bd2090124f672c0d1e233371e3b1dcdca06782d1acaff510bc07abbbd5889af
+-- hash: 94c850d5991877a1ab00d7af6a61d15bec752cafaa08f0f172ec639cb50c4697
 
 name:           adventOfCode2020
 version:        0.1.0.0
@@ -44,6 +44,7 @@ library
     , directory
     , either
     , hspec
+    , lens
     , parsec
     , split
     , validation-selective
@@ -64,6 +65,7 @@ executable adventOfCode2020-exe
     , directory
     , either
     , hspec
+    , lens
     , parsec
     , split
     , validation-selective
@@ -85,6 +87,7 @@ test-suite adventOfCode2020-test
     , directory
     , either
     , hspec
+    , lens
     , parsec
     , split
     , validation-selective

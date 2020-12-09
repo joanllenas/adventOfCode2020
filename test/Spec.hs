@@ -113,3 +113,11 @@ main = hspec $ do
     it "validatePasswordKeys should be Left" $ do
       let pass = [Kv "pid" "087499704", Kv "hgt" "190in", Kv "ecl" "wat", Kv "iyr" "2012", Kv "eyr" "2030", Kv "byr" "1980", Kv "hcl" "#623a2f"]
       validatePasswordKeys (Right pass) `shouldBe` Left "Invalid password: Number 190 out of bounds.Invalid color: wat."
+
+  describe "Day8" $ do
+    it "parsing 'nop +0' should be Right" $ do
+      U.parseString D8.instructionParser "nop +0" `shouldBe` Right (D8.Nop 0 (D8.Vis False))
+    it "parsing 'acc -5' should be Right" $ do
+      U.parseString D8.instructionParser "acc -5" `shouldBe` Right (D8.Acc (-5) (D8.Vis False))
+    it "parsing 'wat -5' should be Left" $ do
+      isLeft (U.parseString D8.instructionParser "wat -5") `shouldBe` True

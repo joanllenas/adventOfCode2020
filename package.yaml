@@ -29,6 +29,7 @@ dependencies:
   - validation-selective
   - either
   - containers
+  - lens
 
 library:
   source-dirs: src
